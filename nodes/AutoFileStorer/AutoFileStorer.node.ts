@@ -48,6 +48,9 @@ export class AutoFileStorer implements INodeType {
 		const destinationPath = this.getNodeParameter('destinationPath', 0) as string;
 		const hashFilenames = this.getNodeParameter('hashFilenames', 0) as boolean;
 
+		// create directory if not exists
+		if (!fs.existsSync(destinationPath)) fs.mkdirSync(destinationPath, { recursive: true });
+
 		const storedFiles: Array<{
 			fileName: string;
 			filePath: string,
