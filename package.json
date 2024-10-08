@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-auto-file-storer",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "A flow for n8n to store files locally after uploading them",
   "keywords": [
     "n8n-community-node-package"
@@ -27,7 +27,7 @@
     "format": "prettier nodes --write",
     "lint": "eslint nodes package.json",
     "lintfix": "eslint nodes package.json --fix",
-    "prepublishOnly": "pnpm build && pnpm lint -c .eslintrc.prepublish.js nodes package.json"
+    "prepublishOnly": "rm -rf ./dist && pnpm build && pnpm lint -c .eslintrc.prepublish.js nodes package.json"
   },
   "files": [
     "dist"
