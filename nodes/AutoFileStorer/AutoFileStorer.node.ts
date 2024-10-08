@@ -27,10 +27,15 @@ export class AutoFileStorer implements INodeType {
 				displayName: 'Destination Path',
 				name: 'destinationPath',
 				type: 'string',
-				default: './n8n_storage/uploaded_files',
+				default: path.join(process.cwd(), 'n8n_storage/uploaded_files'),
 				placeholder: '/path/to/directory',
-				description: 'The directory path where to store the files default is ./n8n_storage/uploaded_files',
+				description: `The directory path where to store the files default is ${path.join(process.cwd(), 'n8n_storage/uploaded_files')}`,
 				"required": false,
+				hint: `
+			The folder will be created if it does not exist.
+			\nWarn : if any file was not hashed will be overwritten if the file name is the same
+			\nWarn: if the app does not have permission to write to the directory, the operation will fail
+				`
 			},
 			{
 				displayName: 'Hash Filenames',
@@ -45,11 +50,11 @@ export class AutoFileStorer implements INodeType {
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
 		const items = this.getInputData();
 
-		const destinationPath = this.getNodeParameter('destinationPath', 0) as string;
+		let destinationPath = this.getNodeParameter('destinationPath', 0) as string;
 		const hashFilenames = this.getNodeParameter('hashFilenames', 0) as boolean;
 
-		// create directory if not exists
-		if (!fs.existsSync(destinationPath)) fs.mkdirSync(path.resolve(destinationPath), { recursive: true });
+		if (destinationPath === '') destinationPath = path.join(process.cwd(), 'n8n_storage/uploaded_files');
+		if (!fs.existsSync(destinationPath)) fs.mkdirSync(path.resolve(destinationPath), {recursive: true});
 
 		const storedFiles: Array<{
 			fileName: string;
@@ -72,11 +77,10 @@ export class AutoFileStorer implements INodeType {
 
 				const fileExtension = binary.fileExtension;
 
-				const filePath = path.join(destinationPath, finalFileName || '');
+				let filename = hashFilenames ? `${finalFileName}.${fileExtension}` : `${originalFileName}`;
+				const filePath = path.resolve(destinationPath, filename || '');
 
-				let filename = hashFilenames ?  `${finalFileName}.${fileExtension}` : `${originalFileName}`;
-
-				fs.writeFileSync(filename, Buffer.from(binary.data, 'base64'));
+				fs.writeFileSync(filePath, Buffer.from(binary.data, 'base64'));
 
 				// Store information about the stored file
 				storedFiles.push({

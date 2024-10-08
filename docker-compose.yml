@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: n8n-dev
+    restart: unless-stopped
+    ports:
+      - "5678:5678"  # Expose n8n on port 5678
+    volumes:
+      -  n8n_data:/home/node/.n8n
+      - ./:/home/node/.n8n/custom/node_modules
+    environment:
+      - GENERIC_TIMEZONE=Europe/Berlin
+      - EXECUTIONS_PROCESS=main
+      - NODE_ENV=development
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=admin
+      - N8N_BASIC_AUTH_PASSWORD=admin
+      - DB_TYPE=sqlite
+      - DB_SQLITE_DATABASE=/home/node/.n8n/database.sqlite
+    entrypoint: ["n8n" , "start"]
+
+volumes:
+    n8n_data:
+
