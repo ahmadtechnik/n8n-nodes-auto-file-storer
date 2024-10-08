@@ -1,7 +1,7 @@
 {
   "name": "n8n-nodes-auto-file-storer",
   "version": "0.1.0",
-  "description": "",
+  "description": "A flow for n8n to store files locally after uploading them",
   "keywords": [
     "n8n-community-node-package"
   ],
@@ -22,21 +22,18 @@
   "packageManager": "pnpm@9.1.4",
   "main": "index.js",
   "scripts": {
-    "preinstall": "npx only-allow pnpm",
     "build": "tsc && gulp build:icons",
     "dev": "tsc --watch",
-    "format": "prettier nodes credentials --write",
-    "lint": "eslint nodes credentials package.json",
-    "lintfix": "eslint nodes credentials package.json --fix",
-    "prepublishOnly": "pnpm build && pnpm lint -c .eslintrc.prepublish.js nodes credentials package.json"
+    "format": "prettier nodes --write",
+    "lint": "eslint nodes package.json",
+    "lintfix": "eslint nodes package.json --fix",
+    "prepublishOnly": "pnpm build && pnpm lint -c .eslintrc.prepublish.js nodes package.json"
   },
   "files": [
     "dist"
   ],
   "n8n": {
     "n8nNodesApiVersion": 1,
-    "credentials": [
-    ],
     "nodes": [
       "dist/nodes/AutoFileStorer/AutoFileStorer.node.js"
     ]
