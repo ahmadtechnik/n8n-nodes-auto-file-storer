@@ -7,8 +7,6 @@ The **AutoFileStorer** and **AutoFileStorerExplorer** nodes work together to sto
 * **AutoFileStorer**: Stores uploaded files to the disk and can optionally hash filenames for uniqueness.
 * **AutoFileStorerExplorer**: Lists files in a directory with detailed metadata such as MIME type, size, and last modified date.
 
-![AutoFileStorer in action](https://github.com/user-attachments/assets/f4017ec5-e9cb-4109-bd25-0611c01ccd12)
-
 ## Features
 
 * **File Storage**: Save uploaded files to a specified directory, with optional hashing for unique filenames.
@@ -46,7 +44,7 @@ Lists files and their metadata:
 * `fileSize`: The size of the file in bytes.
 * `lastModifiedDate`: The date the file was last modified.
 
-![AutoFileStorerExplorer in action](https://github.com/user-attachments/assets/b6f1e27d-3bc4-44ad-83d7-baf400e70bbb)
+![Preview in action](https://github.com/user-attachments/assets/87f0bfce-3107-4987-9ae5-8b85502c73cb)
 
 ## Warnings
 
