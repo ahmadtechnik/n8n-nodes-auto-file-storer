@@ -1,8 +1,8 @@
 {
 	"node": "n8n-nodes-base.AutoFileStorer",
 	"nodeVersion": "1.1",
-	"codexVersion": "1.1",
-	"categories": ["FileManagement"],
+	"codexVersion": "1.0",
+	"categories": ["Data & Storage"],
 	"resources": {
 		"credentialDocumentation": [
 			{
