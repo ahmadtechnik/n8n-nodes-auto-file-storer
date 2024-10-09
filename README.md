@@ -1,109 +1,64 @@
-# AutoFileStorer Node
+# AutoFileStorer & AutoFileStorerExplorer Nodes
 
 ## Overview
 
-The **AutoFileStorer** node is designed to store binary files from an n8n workflow to the local file system. It allows users to upload files, optionally hash the filenames for uniqueness, and save them in a specified directory on disk.
+The **AutoFileStorer** and **AutoFileStorerExplorer** nodes work together to store and explore files within a specified directory in an n8n workflow.
 
-![Screenrecord](https://github.com/user-attachments/assets/f4017ec5-e9cb-4109-bd25-0611c01ccd12)
-![Explorer node in action](https://github.com/user-attachments/assets/b6f1e27d-3bc4-44ad-83d7-baf400e70bbb)
+* **AutoFileStorer**: Stores uploaded files to the disk and can optionally hash filenames for uniqueness.
+* **AutoFileStorerExplorer**: Lists files in a directory with detailed metadata such as MIME type, size, and last modified date.
 
-
+![AutoFileStorer in action](https://github.com/user-attachments/assets/f4017ec5-e9cb-4109-bd25-0611c01ccd12)
 
 ## Features
 
-*   **File Storage**: Upload and store binary files to a specified directory on the file system.
-*   **Optional Filename Hashing**: Choose whether to hash the filenames before saving to ensure unique and anonymized filenames.
-*   **File Metadata**: Provides metadata about the stored files, including the file's original name and its storage path.
+* **File Storage**: Save uploaded files to a specified directory, with optional hashing for unique filenames.
+* **File Exploration**: List stored files and return metadata such as file name, path, MIME type, size, and last modified date.
+* **Metadata Support**: Provides file details for effective file management in workflows.
 
 ## Node Properties
 
-### 1\. Destination Path
+### AutoFileStorer
 
-*   **Name**: `destinationPath`
-*   **Type**: `string`
-*   **Default**: `./n8n_storage/uploaded_files`
-*   **Placeholder**: `/path/to/directory`
-*   **Description**: Specifies the directory path where the uploaded files will be stored. If not provided, the default directory is `./n8n_storage/uploaded_files` relative to the current working directory of n8n. You can specify an absolute path or a relative path.
-*   **Example**:
-	*   `/usr/local/n8n/uploads/`
-	*   `./n8n_storage/my_files`
-*   **Required**: No
+* **Directory Path**: Specify where to store the files (default is `./n8n_storage/uploaded_files`).
+* **Hash Filenames**: Option to hash filenames using MD5 to ensure uniqueness.
 
-### 2\. Hash Filenames
+### AutoFileStorerExplorer
 
-*   **Name**: `hashFilenames`
-*   **Type**: `boolean`
-*   **Default**: `true`
-*   **Description**: If enabled (`true`), the filenames will be hashed using the MD5 algorithm before being saved. This is useful for ensuring that filenames are unique and anonymized. If disabled (`false`), the original filenames will be used.
+* **Directory Path**: Specify the directory to explore (default from config or `./n8n_storage/uploaded_files`).
 
-## Input/Output
+## Inputs/Outputs
 
-### Inputs
+### AutoFileStorer Outputs
 
-**Binary Data**: This node expects binary data as input. The binary data can be passed from another node that handles file uploads (e.g., from an HTTP request or a file upload node).
+Stores files in the specified directory and outputs metadata, including:
 
-### Outputs
+* `fileName`: The name of the file.
+* `filePath`: The path where the file is stored.
+* `fileOriginName`: The original file name before storage.
 
-**Stored File Metadata**: The node outputs an array of stored file metadata in a new field named `stored_files`. Each file's metadata includes:
+### AutoFileStorerExplorer Outputs
 
-*   `fileName`: The full path to the stored file, including the file extension.
-*   `fileOriginName`: The original name of the file before storage.
-*   `filePath`: The directory path where the file was saved (without the extension).
+Lists files and their metadata:
 
-**Example Output**:
+* `fileName`: The name of the file.
+* `filePath`: The full path to the file.
+* `fileMimeType`: The MIME type of the file.
+* `fileSize`: The size of the file in bytes.
+* `lastModifiedDate`: The date the file was last modified.
 
-```
+![AutoFileStorerExplorer in action](https://github.com/user-attachments/assets/b6f1e27d-3bc4-44ad-83d7-baf400e70bbb)
 
-{
-  "stored_files": [
-    {
-      "fileName": "/path/to/directory/hashedfilename.txt",
-      "fileOriginName": "example.txt",
-      "filePath": "/path/to/directory/hashedfilename"
-    }
-  ]
-}
-    
-```
+## Warnings
 
-## How the Node Works
-
-1.  **Receive Binary Data**: The node accepts binary data from a previous node in the workflow, such as files uploaded via HTTP or other methods.
-2.  **Process Each File**: The node loops through the input data and processes each binary file.
-3.  **Filename Handling**: Depending on the `hashFilenames` parameter:
-	*   If hashing is enabled, the node hashes the original filename using the MD5 algorithm and stores the file with the hashed name.
-	*   If hashing is disabled, the original filename is used.
-4.  **Store the File**: The file is written to the specified `destinationPath`. If no path is specified, the default path `./n8n_storage/uploaded_files` is used.
-5.  **Output Metadata**: The node outputs metadata about the stored files, including the original and stored filenames.
-
-## Example Usage
-
-### Use Case 1: Store Files with Hashed Filenames
-
-In this example, the node will store the uploaded files in the default directory with hashed filenames to ensure anonymity and uniqueness:
-
-*   **Destination Path**: `./n8n_storage/uploaded_files`
-*   **Hash Filenames**: `true` (default)
-
-### Use Case 2: Store Files Without Hashing
-
-If you want to store files with their original filenames:
-
-*   **Destination Path**: `/usr/local/n8n/uploads`
-*   **Hash Filenames**: `false`
-
-In this case, the files will be saved in `/usr/local/n8n/uploads` with their original names.
+* **File Overwriting** (AutoFileStorer): Files will be overwritten if not hashed (if the same file already exists).
+* **File Duplication** (AutoFileStorer): Files with hashed names may result in duplicates if uploaded multiple times (if the same file is uploaded multiple times).
+* **Directory Access** (AutoFileStorerExplorer): Ensure n8n has read permissions to the directory.
 
 ## Error Handling
 
-*   **Invalid Destination Path**: If the destination path is invalid or inaccessible, the node will throw an error. Ensure that the directory exists and that the n8n process has write permissions.
-*   **Binary Data Missing**: If no binary data is passed to the node, it will not execute properly. Ensure that the previous node provides binary data.
-
-## Limitations
-
-*   **File Overwriting**: If the `hashFilenames` option is disabled and a file with the same name already exists in the destination folder, the new file will overwrite the existing file. Use hashing to avoid this.
-*   **File Extension**: The node will retain the original file extension when saving the file to disk.
+* **Invalid Path**: If the directory doesn't exist or isn't accessible, an error will be thrown.
+* **Permission Denied**: Ensure proper file permissions for reading and writing to the directory.
 
 ## Conclusion
 
-The **AutoFileStorer** node is a powerful tool for saving uploaded files locally on the server while optionally hashing filenames for uniqueness and security. It's useful in workflows where you need to persist files received from various sources, such as APIs or user uploads.
+The **AutoFileStorer** and **AutoFileStorerExplorer** nodes provide a simple and effective way to manage file uploads and file exploration in n8n workflows, offering flexibility with file handling and retrieval.

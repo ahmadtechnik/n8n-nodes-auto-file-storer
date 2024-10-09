@@ -10,7 +10,7 @@ import * as path from 'path';
 import * as crypto from 'crypto';
 import {AutoFileStorerConfigs} from "../Common/Common";
 
-let defaultStoragePath =  AutoFileStorerConfigs.defaultStoragePath || "";
+let defaultStoragePath = AutoFileStorerConfigs.defaultStoragePath || "";
 
 export class AutoFileStorer implements INodeType {
 	description: INodeTypeDescription = {
@@ -51,38 +51,52 @@ export class AutoFileStorer implements INodeType {
 	};
 
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
+		// Get input data
 		const items = this.getInputData();
 
+		// Retrieve parameters
 		let destinationPath = this.getNodeParameter('destinationPath', 0) as string;
 		const hashFilenames = this.getNodeParameter('hashFilenames', 0) as boolean;
 
+		// Set default destination path if not provided
 		if (destinationPath === '') destinationPath = defaultStoragePath;
 		if (!fs.existsSync(destinationPath)) fs.mkdirSync(path.resolve(destinationPath), {recursive: true});
 
+		// Array to store information about stored files
 		const storedFiles: Array<{
 			fileName: string;
 			filePath: string,
 			fileOriginName: string
 		}> = [];
 
+		// Process each item
 		for (let i = 0; i < items.length; i++) {
 			const binaryData = items[i].binary ?? {};
 			for (const key of Object.keys(binaryData)) {
 				const binary = binaryData[key];
 				const originalFileName = binary.fileName || "";
+				const fileExtension = binary.fileExtension || "";
 
+				// Get the current date and time to use in the filename
+				const currentDate = new Date().toISOString().replace(/[-:.]/g, '');
+
+				// Generate a hash using the original file name and the current date/time
 				const finalFileName = hashFilenames
 					? crypto
 						.createHash('md5')
-						.update(originalFileName || '')
+						.update(originalFileName + currentDate)
 						.digest('hex')
 					: originalFileName;
 
-				const fileExtension = binary.fileExtension;
+				// Construct the file name with the extension
+				const filename = hashFilenames
+					? `${finalFileName}.${fileExtension}`
+					: `${originalFileName}`;
 
-				let filename = hashFilenames ? `${finalFileName}.${fileExtension}` : `${originalFileName}`;
+				// Resolve the complete file path
 				const filePath = path.resolve(destinationPath, filename || '');
 
+				// Write the file to the file system
 				fs.writeFileSync(filePath, Buffer.from(binary.data, 'base64'));
 
 				// Store information about the stored file
@@ -93,9 +107,11 @@ export class AutoFileStorer implements INodeType {
 				});
 			}
 
+			// Add the stored files to the output JSON
 			items[i].json.stored_files = storedFiles;
 		}
 
+		// Return the processed output data
 		return this.prepareOutputData(items);
 	}
 }
