@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-auto-file-storer",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "A flow for n8n to store files locally after uploading them",
   "keywords": [
     "n8n-community-node-package"
@@ -35,7 +35,8 @@
   "n8n": {
     "n8nNodesApiVersion": 1,
     "nodes": [
-      "dist/nodes/AutoFileStorer/AutoFileStorer.node.js"
+      "dist/nodes/AutoFileStorer/AutoFileStorer.node.js",
+      "dist/nodes/AutoFileStorerExplorer/AutoFileStorerExplorer.node.js"
     ]
   },
   "devDependencies": {
