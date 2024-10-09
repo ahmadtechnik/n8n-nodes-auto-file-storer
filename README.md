@@ -5,6 +5,8 @@
 The **AutoFileStorer** node is designed to store binary files from an n8n workflow to the local file system. It allows users to upload files, optionally hash the filenames for uniqueness, and save them in a specified directory on disk.
 
 ![Screenrecord](https://github.com/user-attachments/assets/f4017ec5-e9cb-4109-bd25-0611c01ccd12)
+![Explorer node in action](https://github.com/user-attachments/assets/b6f1e27d-3bc4-44ad-83d7-baf400e70bbb)
+
 
 
 ## Features
